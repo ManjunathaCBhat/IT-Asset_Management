@@ -8,6 +8,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 import bcrypt
 from pathlib import Path
+import subprocess
+import sys
+import time
 
 # Load environment variables
 load_dotenv()
@@ -209,6 +212,90 @@ async def seed_admin_user(db):
         print(f"✅ Admin user created: {admin_email} / password123")
     else:
         print("ℹ️  Admin user already exists")
+
+
+# --- Frontend dev server auto-start (when no production build is present) ---
+# This will spawn `npm start` in the frontend folder when the backend starts.
+# Control with the START_FRONTEND env var (set to '0' or 'false' to disable).
+
+@app.on_event("startup")
+async def startup_frontend_dev_server():
+    try:
+        start_frontend = os.getenv("START_FRONTEND", "1").lower()
+        if start_frontend in ("0", "false", "no"):
+            print("🔵 START_FRONTEND disabled via environment variable; not launching frontend dev server")
+            return
+
+        repo_root = Path(__file__).parent
+        frontend_dir = repo_root / "frontend"
+        build_dir = frontend_dir / "build"
+
+        # Only start dev server when no production build exists
+        if not frontend_dir.exists():
+            print("⚠️  Frontend directory not found; skipping frontend auto-start")
+            return
+
+        if build_dir.exists():
+            print("ℹ️  Frontend build detected; not starting dev server")
+            return
+
+        # Ensure logs directory exists
+        logs_dir = repo_root / "logs"
+        logs_dir.mkdir(parents=True, exist_ok=True)
+        log_path = logs_dir / "frontend.log"
+
+        # Launch `npm start` in the frontend folder
+        npm_cmd = ["npm", "start"]
+        print(f"🚀 Starting frontend dev server: cd {frontend_dir} && npm start (logs -> {log_path})")
+
+        # Open the log file in append mode, line-buffered when possible
+        try:
+            log_fh = open(log_path, "a", buffering=1, encoding="utf-8")
+        except TypeError:
+            # Python <3.8 fallback (buffering param behavior)
+            log_fh = open(log_path, "a", encoding="utf-8")
+
+        # On Windows, Popen should find 'npm' if installed; shell=False preferred
+        proc = subprocess.Popen(npm_cmd, cwd=str(frontend_dir), stdout=log_fh, stderr=subprocess.STDOUT, shell=False)
+
+        # store process handle so we can terminate on shutdown
+        app.state.frontend_process = proc
+        app.state.frontend_log_file = log_fh
+
+        # Give the dev server a moment to start and write logs
+        time.sleep(0.5)
+        print(f"✅ Frontend dev server launched (PID={proc.pid})")
+    except Exception as e:
+        print(f"Error starting frontend dev server: {e}")
+
+
+@app.on_event("shutdown")
+def shutdown_frontend_dev_server():
+    try:
+        proc = getattr(app.state, "frontend_process", None)
+        log_fh = getattr(app.state, "frontend_log_file", None)
+        if proc:
+            if proc.poll() is None:
+                print(f"🛑 Terminating frontend dev server (PID={proc.pid})")
+                try:
+                    proc.terminate()
+                    # short wait for graceful exit
+                    time.sleep(0.5)
+                    if proc.poll() is None:
+                        proc.kill()
+                except Exception:
+                    pass
+            else:
+                print("ℹ️  Frontend dev server already exited")
+
+        if log_fh:
+            try:
+                log_fh.flush()
+                log_fh.close()
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"Error shutting down frontend dev server: {e}")
 
 if __name__ == "__main__":
     import uvicorn

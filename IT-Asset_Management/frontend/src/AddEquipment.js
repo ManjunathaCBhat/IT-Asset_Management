@@ -81,16 +81,21 @@ const AddEquipment = () => {
     } catch (error) {
       debugLog('Error adding equipment:', error);
       if (error.response?.status === 400) {
-        const errorMessage = error.response.data.message;
-        if (errorMessage.includes('Serial Number already exists')) {
+        // defensive: the server may return various shapes; prefer 'message' or 'detail' if available
+        debugLog('AddEquipment: error.response.data =', error?.response?.data);
+        const errorMessage = error?.response?.data?.message ?? error?.response?.data?.detail ?? (typeof error?.response?.data === 'string' ? error.response.data : null);
+        if (errorMessage && errorMessage.includes('Serial Number already exists')) {
           setErrors({ serialNumber: errorMessage });
           message.error('Serial number already exists. Please use a unique serial number.');
           form.setFields([{ name: 'serialNumber', errors: [errorMessage] }]);
-        } else if (errorMessage.includes('Asset ID already exists')) {
+        } else if (errorMessage && errorMessage.includes('Asset ID already exists')) {
           setErrors({ assetId: errorMessage });
           message.error('Asset ID already exists. Please try again.');
-        } else {
+        } else if (errorMessage) {
           message.error(errorMessage);
+        } else {
+          // fallback when no structured message is present
+          message.error('Validation error. Please check your input and try again.');
         }
       } else if (error.response?.status === 500) {
         message.error('Server error. Please try again later.');
