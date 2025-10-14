@@ -1,7 +1,9 @@
 # Node
 node_modules/
-
+# .gitignore
 .env
+app.yaml
+
 # Python
 .venv/
 venv/
