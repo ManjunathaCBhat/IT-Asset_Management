@@ -1,0 +1,281 @@
+/* styles.css -- ONE unified file for all pages/components */
+
+/* ===== BLUR EFFECT for Table/List/Content When Modal is Open ===== */
+.instock-blur, .instock-blur-effect {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.3s;
+}
+
+/* ===== GLOBAL HEADERS (page, dashboard, panels) ===== */
+.page-header,
+.damaged-header,
+.ewaste-header,
+.dashboard-summary-row,
+.user-header,
+.removed-assets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dashboard-title,
+.add-equipment-title,
+.ewaste-title,
+.instock-title,
+.inuse-title,
+.user-title,
+.removed-assets-title {
+  margin: 0;
+}
+
+/* ===== WIDE CONTAINERS FOR MAIN PAGES ===== */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-title {
+  margin-bottom: 24px;
+}
+
+.dashboard-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dashboard-category-section {
+  margin-bottom: 24px;
+  margin-top: 32px;
+}
+
+.dashboard-category-inner-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.dashboard-category-icon {
+  flex: 0 0 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 58px;
+}
+
+.dashboard-category-list-wrapper {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  height: 58px;
+  max-width: 160px; /* Tweak as needed */
+}
+
+.dashboard-category-list {
+  width: 100%;
+  min-width: 110px;
+}
+
+.dashboard-list-item {
+  padding: 4px 0;
+  border-bottom: none;
+}
+
+.dashboard-center-spin {
+  text-align: center;
+  padding: 50px;
+}
+
+
+.add-equipment-card {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* ===== SEARCH INPUT SIZING ===== */
+.ewaste-search-input,
+.damaged-search-input,
+.inuse-search-input {
+  width: 250px;
+}
+.instock-search-input,
+.removed-assets-search-input,
+.dashboard-search-input {
+  width: 300px;
+}
+
+/* ===== INFO TABLE STYLES FOR MODALS ===== */
+.asset-info-table .ant-table-wrapper .ant-table {
+  border: 1px solid #ececec;
+  border-radius: 5px;
+}
+.asset-info-table .ant-table-cell,
+.asset-info-table .ant-table-thead > tr > th,
+.asset-info-table .ant-table-tbody > tr > td {
+  border: 1px solid #ececec !important;
+  padding: 4px 8px;
+  background: #fff;
+  font-size: 13px;
+  color: #222;
+}
+.asset-info-table .ant-table-thead > tr > th {
+  background-color: #fafcff;
+  color: #222;
+  font-weight: 600;
+}
+.asset-info-table .ant-table-tbody > tr > td {
+  font-size: 13px !important;
+  padding: 4px 8px !important;
+}
+.asset-info-table {
+  margin: 0;
+  margin-bottom: 20px;
+}
+.damaged-modal-table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.small-text-row {
+  font-size: 13px;
+}
+
+/* ===== DASHBOARD CARDS & CATEGORY SECTIONS (Advanced Alignment) ===== */
+.dashboard-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dashboard-category-section {
+  margin-bottom: 24px;
+  margin-top: 32px;
+}
+.dashboard-center-spin {
+  text-align: center;
+  padding: 50px;
+}
+
+/* ======= CATEGORY CARD ALIGNMENT (alignment-fixed version, for dashboard) ======= */
+.dashboard-category-inner-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.dashboard-category-icon {
+  flex: 0 0 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 58px;
+}
+.dashboard-category-list-wrapper {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  height: 58px;
+  max-width: 160px; /* tweak as necessary if your list is wider */
+}
+.dashboard-category-list {
+  width: 100%;
+  min-width: 110px;
+}
+.dashboard-list-item {
+  padding: 4px 0;
+  border-bottom: none;
+}
+
+/* ===== USER MANAGEMENT ===== */
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.user-title {
+  margin: 0;
+}
+.user-table {
+  width: 100%;
+  min-width: 300px;
+}
+
+/* ===== MODALS/SECTION TITLES ===== */
+.hardware-section-title,
+.assignee-section-title,
+.comments-section-title,
+.asset-info-title {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* ===== ICON & ACTION CLASSES ===== */
+.icon-info   { color: #1890ff; font-size: 18px; }
+.icon-assign { font-size: 18px; }
+.icon-more   { font-size: 20px; }
+.icon-view   { color: blue; font-size: 18px; }
+.icon-edit   { font-size: 20px; }
+
+.danger-action { color: red; }
+.ewaste-action { color: #8B572A; }
+
+/* ===== REMOVED ASSETS ===== */
+.removed-assets-container {
+  padding: 20px;
+}
+.removed-assets-title {
+  margin: 0;
+}
+.removed-assets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 14px;
+}
+.removed-assets-description {
+  margin-top: 14px;
+  margin-left: 1px;
+  color: #888;
+  font-size: 14px;
+}
+.removed-assets-search-input {
+  width: 300px;
+}
+.removed-assets-table {
+  /* You may want to add min-width, margin-top, etc., as needed */
+}
+.removed-assets-alert {
+  margin-bottom: 16px;
+}
+
+/* ===== REMOVE NUMBER ARROWS ON NUMBER FIELD ===== */
+.hide-number-arrows input[type="number"]::-webkit-inner-spin-button,
+.hide-number-arrows input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.hide-number-arrows input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+
+.add-equipment-container {
+  min-height: 50vh;              /* Full viewport height for vertical centering */
+  display: flex;
+  align-items: center;            /* Vertical center */
+  justify-content: center;        /* Horizontal center */
+}
