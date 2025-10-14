@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request
-from backend.app.models import UserLogin, Token, ForgotPassword, ResetPassword
+from ..models import UserLogin, Token, ForgotPassword, ResetPassword
 import bcrypt
 import jwt
 import os

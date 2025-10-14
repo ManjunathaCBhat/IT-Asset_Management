@@ -7,12 +7,15 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import bcrypt
+from pathlib import Path
 
 # Load environment variables
 load_dotenv()
 
-# Import routes from backend
+# Import routes and pydantic models from backend package
+from backend.app import routes as backend_routes
 from backend.app.routes import auth, users, equipment, email
+from backend.models import UserLogin, Token, ForgotPassword, ResetPassword
 
 app = FastAPI(
     title="IT Asset Management API",
@@ -41,8 +44,40 @@ async def startup_db_client():
     app.mongodb = app.mongodb_client[os.getenv("DB_NAME", "asset_management")]
     print(f"✅ MongoDB connected successfully to database: {os.getenv('DB_NAME', 'asset_management')}")
     
-    # Seed admin user
+    # Ensure indexes and seed admin user
+    try:
+        await ensure_indexes(app.mongodb)
+    except Exception as e:
+        print(f"Error ensuring indexes: {e}")
+
     await seed_admin_user(app.mongodb)
+
+
+async def ensure_indexes(db):
+    """Create required indexes for users and equipment collections."""
+    users = db["users"]
+    equipment = db["equipment"]
+
+    # Users: unique email
+    try:
+        await users.create_index("email", unique=True)
+        print("✅ Created/ensured unique index on users.email")
+    except Exception as e:
+        print(f"Could not create index on users.email: {e}")
+
+    # Equipment: unique assetId and (sparse) serialNumber
+    try:
+        await equipment.create_index("assetId", unique=True)
+        print("✅ Created/ensured unique index on equipment.assetId")
+    except Exception as e:
+        print(f"Could not create index on equipment.assetId: {e}")
+
+    try:
+        # serialNumber may be missing on many docs; sparse avoids rejecting null duplicates
+        await equipment.create_index("serialNumber", unique=True, sparse=True)
+        print("✅ Created/ensured unique sparse index on equipment.serialNumber")
+    except Exception as e:
+        print(f"Could not create index on equipment.serialNumber: {e}")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
@@ -60,6 +95,44 @@ app.include_router(email.router, tags=["Email"])
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "message": "IT Asset Management API is running"}
+
+
+@app.get("/internal/db-status")
+async def db_status():
+    """Diagnostic endpoint: reports DB connection, admin user presence, and indexes."""
+    status = {
+        "db_connected": False,
+        "db_name": None,
+        "admin_exists": False,
+        "users_indexes": [],
+        "equipment_indexes": [],
+    }
+
+    if not hasattr(app, 'mongodb') or app.mongodb is None:
+        return status
+
+    status['db_connected'] = True
+    status['db_name'] = app.mongodb.name
+
+    users = app.mongodb['users']
+    equipment = app.mongodb['equipment']
+
+    admin = await users.find_one({'email': 'admin@example.com'})
+    status['admin_exists'] = bool(admin)
+
+    try:
+        async for idx in users.list_indexes():
+            status['users_indexes'].append(idx['name'])
+    except Exception:
+        status['users_indexes'] = ['error_reading_indexes']
+
+    try:
+        async for idx in equipment.list_indexes():
+            status['equipment_indexes'].append(idx['name'])
+    except Exception:
+        status['equipment_indexes'] = ['error_reading_indexes']
+
+    return status
 
 # Serve React static files
 frontend_build_path = Path(__file__).parent / "frontend" / "build"

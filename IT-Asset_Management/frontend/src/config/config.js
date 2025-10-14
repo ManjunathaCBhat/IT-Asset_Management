@@ -3,7 +3,7 @@
 
 const config = {
   // API Configuration - TEMPORARILY HARDCODED FOR LOCAL TESTING
-  API_BASE_URL: 'http://localhost:5000',
+  API_BASE_URL: 'http://localhost:8000',
   
   // Environment Detection
   ENVIRONMENT: process.env.NODE_ENV || 'development',

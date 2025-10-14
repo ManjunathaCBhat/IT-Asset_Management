@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request, Header
-from backend.app.models import UserCreate, UserUpdate, UserResponse
+from ..models import UserCreate, UserUpdate, UserResponse
 from backend.app.routes.auth import verify_jwt_token
 from typing import List, Optional
 from bson import ObjectId

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from backend.app.models import EmailSend
+from ..models import EmailSend
 import aiosmtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
