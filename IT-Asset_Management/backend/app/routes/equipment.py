@@ -20,10 +20,11 @@ def check_role(user: dict, allowed_roles: List[str]):
         raise HTTPException(status_code=403, detail="Access denied. Insufficient role.")
 
 @router.get("", response_model=List[dict])
-async def get_all_equipment(request: Request, user: dict = Header(None, alias="x-auth-token")):
+async def get_all_equipment(request: Request, auth_token: Optional[str] = Header(None, alias="x-auth-token")):
     """Get all equipment (not deleted)"""
-    if user:
-        user = verify_auth(user)
+    user = None
+    if auth_token:
+        user = verify_auth(auth_token)
     
     db = request.app.mongodb
     equipment_collection = db["equipment"]
@@ -38,10 +39,11 @@ async def get_all_equipment(request: Request, user: dict = Header(None, alias="x
     return equipment_list
 
 @router.get("/summary")
-async def get_equipment_summary(request: Request, user: dict = Header(None, alias="x-auth-token")):
+async def get_equipment_summary(request: Request, auth_token: Optional[str] = Header(None, alias="x-auth-token")):
     """Get equipment summary statistics"""
-    if user:
-        user = verify_auth(user)
+    user = None
+    if auth_token:
+        user = verify_auth(auth_token)
     
     db = request.app.mongodb
     equipment_collection = db["equipment"]
@@ -63,10 +65,11 @@ async def get_equipment_summary(request: Request, user: dict = Header(None, alia
     }
 
 @router.get("/count/{category}")
-async def get_category_count(category: str, request: Request, user: dict = Header(None, alias="x-auth-token")):
+async def get_category_count(category: str, request: Request, auth_token: Optional[str] = Header(None, alias="x-auth-token")):
     """Get count of equipment by category"""
-    if user:
-        user = verify_auth(user)
+    user = None
+    if auth_token:
+        user = verify_auth(auth_token)
     
     db = request.app.mongodb
     equipment_collection = db["equipment"]
@@ -79,10 +82,11 @@ async def get_category_count(category: str, request: Request, user: dict = Heade
     return {"count": count}
 
 @router.get("/removed")
-async def get_removed_equipment(request: Request, user: dict = Header(None, alias="x-auth-token")):
+async def get_removed_equipment(request: Request, auth_token: Optional[str] = Header(None, alias="x-auth-token")):
     """Get all removed equipment"""
-    if user:
-        user = verify_auth(user)
+    user = None
+    if auth_token:
+        user = verify_auth(auth_token)
     
     db = request.app.mongodb
     equipment_collection = db["equipment"]
@@ -100,10 +104,11 @@ async def get_removed_equipment(request: Request, user: dict = Header(None, alia
 async def create_equipment(
     equipment: EquipmentCreate,
     request: Request,
-    user: dict = Header(None, alias="x-auth-token")
+    auth_token: Optional[str] = Header(None, alias="x-auth-token")
 ):
     """Create new equipment (Admin/Editor only)"""
-    user = verify_auth(user)
+    # require authentication
+    user = verify_auth(auth_token)
     check_role(user, ["Admin", "Editor"])
     
     db = request.app.mongodb
@@ -150,10 +155,10 @@ async def update_equipment(
     equipment_id: str,
     equipment: EquipmentUpdate,
     request: Request,
-    user: dict = Header(None, alias="x-auth-token")
+    auth_token: Optional[str] = Header(None, alias="x-auth-token")
 ):
     """Update equipment (Admin/Editor only)"""
-    user = verify_auth(user)
+    user = verify_auth(auth_token)
     check_role(user, ["Admin", "Editor"])
     
     db = request.app.mongodb
@@ -207,10 +212,10 @@ async def update_equipment(
 async def delete_equipment(
     equipment_id: str,
     request: Request,
-    user: dict = Header(None, alias="x-auth-token")
+    auth_token: Optional[str] = Header(None, alias="x-auth-token")
 ):
     """Soft delete equipment (Admin only)"""
-    user = verify_auth(user)
+    user = verify_auth(auth_token)
     check_role(user, ["Admin"])
     
     db = request.app.mongodb

@@ -19,9 +19,9 @@ def check_admin(user: dict):
         raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
 
 @router.get("", response_model=List[dict])
-async def get_all_users(request: Request, user: dict = Header(None, alias="x-auth-token")):
+async def get_all_users(request: Request, auth_token: Optional[str] = Header(None, alias="x-auth-token")):
     """Get all users (Admin only)"""
-    user = verify_auth(user)
+    user = verify_auth(auth_token)
     check_admin(user)
     
     db = request.app.mongodb
@@ -42,10 +42,10 @@ async def get_all_users(request: Request, user: dict = Header(None, alias="x-aut
 async def create_user(
     new_user: UserCreate,
     request: Request,
-    user: dict = Header(None, alias="x-auth-token")
+    auth_token: Optional[str] = Header(None, alias="x-auth-token")
 ):
     """Create new user (Admin only)"""
-    user = verify_auth(user)
+    user = verify_auth(auth_token)
     check_admin(user)
     
     db = request.app.mongodb
@@ -72,10 +72,10 @@ async def update_user(
     user_id: str,
     user_update: UserUpdate,
     request: Request,
-    user: dict = Header(None, alias="x-auth-token")
+    auth_token: Optional[str] = Header(None, alias="x-auth-token")
 ):
     """Update user (Admin only)"""
-    user = verify_auth(user)
+    user = verify_auth(auth_token)
     check_admin(user)
     
     db = request.app.mongodb
@@ -130,10 +130,10 @@ async def update_user(
 async def delete_user(
     user_id: str,
     request: Request,
-    user: dict = Header(None, alias="x-auth-token")
+    auth_token: Optional[str] = Header(None, alias="x-auth-token")
 ):
     """Delete user (Admin only)"""
-    user = verify_auth(user)
+    user = verify_auth(auth_token)
     check_admin(user)
     
     db = request.app.mongodb
