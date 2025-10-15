@@ -134,7 +134,7 @@ const AppLayout = ({ user, handleLogout, expiringItems, refreshExpiringItems, la
             if (clearAllNotifications) {
                 await clearAllNotifications();
             }
-            const notificationIds = expiringItems.map(item => item.serialNumber || item.id);
+            const notificationIds = itemsArray.map(item => item.serialNumber || item.id);
             const updatedCleared = [...clearedNotifications, ...notificationIds];
             setClearedNotifications(updatedCleared);
             localStorage.setItem(getClearedNotificationsKey(user), JSON.stringify(updatedCleared));
@@ -165,8 +165,9 @@ const AppLayout = ({ user, handleLogout, expiringItems, refreshExpiringItems, la
         { key: '/removed', icon: <MinusCircleOutlined />, label: 'Removed', statusKey: 'Removed' },
     ];
 
-    // Filter out cleared notifications
-    const filteredExpiringItems = expiringItems.filter(item => 
+    // Ensure expiringItems is an array (defensive) and filter out cleared notifications
+    const itemsArray = Array.isArray(expiringItems) ? expiringItems : [];
+    const filteredExpiringItems = itemsArray.filter(item => 
         !clearedNotifications.includes(item.serialNumber || item.id)
     );
 
