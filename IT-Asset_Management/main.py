@@ -308,4 +308,4 @@ if __name__ == "__main__":
     print(f"🏥 Health: http://localhost:{port}/health")
     print(f"{'='*60}\n")
     
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
