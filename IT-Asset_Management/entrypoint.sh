@@ -5,12 +5,12 @@ set -e
 echo "Starting container entrypoint..."
 echo "PWD: $(pwd)"
 echo "User: $(whoami 2>/dev/null || true)"
-echo "ENV PORT='${PORT:-8080}'"
+echo "ENV PORT='${PORT:-8000}'"
 echo "Listing /app contents:"
 ls -la || true
 
 # Use ${PORT:-8080} as fallback—Cloud Run sets PORT at runtime
-PORT_TO_USE="${PORT:-8080}"
+PORT_TO_USE="${PORT:-8000}"
 
 echo "Launching uvicorn on 0.0.0.0:${PORT_TO_USE} (reload disabled)"
 
