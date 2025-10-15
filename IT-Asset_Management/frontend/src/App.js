@@ -19,7 +19,7 @@ import WelcomePage from './WelcomePage';
 import ResetPasswordPage from './ResetPasswordPage';
 import RemovedAssetsTable from './RemovedAssetsTable';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://it-asset-version01-804186663775.europe-west1.run.app';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://it-asset-management-804186663775.europe-west1.run.app';
 
 // --- Role Banner Component ---
 const RoleBanner = ({ userRole }) => {

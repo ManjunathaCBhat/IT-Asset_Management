@@ -303,9 +303,15 @@ if __name__ == "__main__":
     print(f"\n{'='*60}")
     print(f"🚀 Starting IT Asset Management Server")
     print(f"{'='*60}")
-    print(f"📍 Server: http://localhost:{port}")
-    print(f"📚 API Docs: http://localhost:{port}/docs")
-    print(f"🏥 Health: http://localhost:{port}/health")
+    api_base = os.getenv('API_BASE_URL')
+    if api_base:
+        print(f"📍 Server: {api_base}")
+        print(f"📚 API Docs: {api_base}/docs")
+        print(f"🏥 Health: {api_base}/health")
+    else:
+        print(f"📍 Server: http://localhost:{port}")
+        print(f"📚 API Docs: http://localhost:{port}/docs")
+        print(f"🏥 Health: http://localhost:{port}/health")
     print(f"{'='*60}\n")
     
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
