@@ -14,10 +14,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Tell Cloud Run what default port to listen on (can be overridden by platform)
-ENV PORT=8080
+ENV PORT=8000
 
 # Expose the default port (informational)
-EXPOSE 8080
+EXPOSE 8000
 
 # Copy entrypoint script and make executable
 COPY entrypoint.sh /entrypoint.sh
