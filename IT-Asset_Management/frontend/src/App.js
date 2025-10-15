@@ -154,12 +154,18 @@ const App = () => {
 
     // --- Render Logic ---
     if (loading) {
-        return <Spin spinning={true} size="large" tip="Loading..." style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)'
-        }} />;
+        return (
+            <div style={{
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                textAlign: 'center'
+            }}>
+                <Spin size="large" />
+                <div style={{ marginTop: 12, color: '#666' }}>Loading...</div>
+            </div>
+        );
     }
 
     return (
