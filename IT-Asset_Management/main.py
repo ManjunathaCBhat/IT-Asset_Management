@@ -299,7 +299,7 @@ def shutdown_frontend_dev_server():
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8080))
+    port = int(os.getenv("PORT",8000))
     print(f"\n{'='*60}")
     print(f"🚀 Starting IT Asset Management Server")
     print(f"{'='*60}")
