@@ -26,8 +26,7 @@ load_dotenv()
 # ======================== ENV ========================
 MONGO_URI = os.getenv('MONGO_URI')
 JWT_SECRET = os.getenv('JWT_SECRET', 'dev-secret')
-# Default to the deployed URL if API_BASE_URL isn't set locally
-API_BASE_URL = os.getenv('API_BASE_URL', 'https://it-asset-management-804186663775.europe-west1.run.app')
+API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost:8000')
 SMTP_HOST = os.getenv('SMTP_HOST')
 SMTP_PORT = int(os.getenv('SMTP_PORT', '0')) if os.getenv('SMTP_PORT') else None
 SMTP_USER = os.getenv('SMTP_USER')

@@ -42,30 +42,18 @@ async def startup_db_client():
     if not mongo_uri:
         print("WARNING: MONGO_URI not found in environment variables")
         return
+    
+    app.mongodb_client = AsyncIOMotorClient(mongo_uri)
+    app.mongodb = app.mongodb_client[os.getenv("DB_NAME", "asset_management")]
+    print(f"✅ MongoDB connected successfully to database: {os.getenv('DB_NAME', 'asset_management')}")
+    
+    # Ensure indexes and seed admin user
     try:
-        app.mongodb_client = AsyncIOMotorClient(mongo_uri, serverSelectionTimeoutMS=5000)
-        # force a server selection / auth check
-        await app.mongodb_client.server_info()
-        app.mongodb = app.mongodb_client[os.getenv("DB_NAME", "asset_management")]
-        print(f"✅ MongoDB connected successfully to database: {os.getenv('DB_NAME', 'asset_management')}")
-
-        # Ensure indexes and seed admin user
-        try:
-            await ensure_indexes(app.mongodb)
-        except Exception as e:
-            print(f"Error ensuring indexes: {e}")
-
-        try:
-            await seed_admin_user(app.mongodb)
-        except Exception as e:
-            print(f"Error seeding admin user: {e}")
+        await ensure_indexes(app.mongodb)
     except Exception as e:
-        # Don't crash the app on DB auth/connect errors; log helpful guidance
-        print("⚠️  Could not connect to MongoDB.")
-        print(f"Detail: {e}")
-        print("Please check your MONGO_URI, database user, password (URL-encoded), network access (IP whitelist/Atlas VPC), and that the Atlas user exists.")
-        app.mongodb_client = None
-        app.mongodb = None
+        print(f"Error ensuring indexes: {e}")
+
+    await seed_admin_user(app.mongodb)
 
 
 async def ensure_indexes(db):
@@ -208,28 +196,22 @@ else:
 async def seed_admin_user(db):
     """Create default admin user if not exists"""
     admin_email = "admin@example.com"
-    if not db:
-        print("⚠️  seed_admin_user: No DB available; skipping admin seed.")
-        return
-
-    try:
-        users_collection = db["users"]
-        existing_admin = await users_collection.find_one({"email": admin_email})
-
-        if not existing_admin:
-            hashed_password = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt())
-            admin_user = {
-                "name": "Admin",
-                "email": admin_email,
-                "password": hashed_password.decode('utf-8'),
-                "role": "Admin"
-            }
-            await users_collection.insert_one(admin_user)
-            print(f"✅ Admin user created: {admin_email} / password123")
-        else:
-            print("ℹ️  Admin user already exists")
-    except Exception as e:
-        print(f"⚠️  Failed to seed admin user: {e}")
+    users_collection = db["users"]
+    
+    existing_admin = await users_collection.find_one({"email": admin_email})
+    
+    if not existing_admin:
+        hashed_password = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt())
+        admin_user = {
+            "name": "Admin",
+            "email": admin_email,
+            "password": hashed_password.decode('utf-8'),
+            "role": "Admin"
+        }
+        await users_collection.insert_one(admin_user)
+        print(f"✅ Admin user created: {admin_email} / password123")
+    else:
+        print("ℹ️  Admin user already exists")
 
 
 # --- Frontend dev server auto-start (when no production build is present) ---
@@ -321,19 +303,9 @@ if __name__ == "__main__":
     print(f"\n{'='*60}")
     print(f"🚀 Starting IT Asset Management Server")
     print(f"{'='*60}")
-    api_base = os.getenv('API_BASE_URL')
-    if api_base:
-        print(f"📍 Server: {api_base}")
-        print(f"📚 API Docs: {api_base}/docs")
-        print(f"🏥 Health: {api_base}/health")
-    else:
-        print(f"📍 Server: http://localhost:{port}")
-        print(f"📚 API Docs: http://localhost:{port}/docs")
-        print(f"🏥 Health: http://localhost:{port}/health")
+    print(f"📍 Server: http://localhost:{port}")
+    print(f"📚 API Docs: http://localhost:{port}/docs")
+    print(f"🏥 Health: http://localhost:{port}/health")
     print(f"{'='*60}\n")
     
-    # Use reload only when explicitly requested (DEV_RELOAD=1). Cloud Run containers
-    # should not use the auto-reloader because it starts watchdog processes that
-    # can interfere with container lifecycle and health checks.
-    dev_reload = os.getenv('DEV_RELOAD', '0').lower() in ('1', 'true', 'yes')
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=dev_reload)
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

@@ -37,8 +37,6 @@ def verify_jwt_token(token: str) -> dict:
 async def login(user: UserLogin, request: Request):
     """User login endpoint"""
     db = request.app.mongodb
-    if not db:
-        raise HTTPException(status_code=503, detail="Database unavailable. Check MONGO_URI and DB connectivity.")
     users_collection = db["users"]
     
     # Find user by email
@@ -72,8 +70,6 @@ async def forgot_password(data: ForgotPassword, request: Request):
     from backend.app.routes.email import send_reset_email
     
     db = request.app.mongodb
-    if not db:
-        raise HTTPException(status_code=503, detail="Database unavailable. Check MONGO_URI and DB connectivity.")
     users_collection = db["users"]
     
     # Find user
@@ -113,8 +109,6 @@ async def forgot_password(data: ForgotPassword, request: Request):
 async def reset_password(data: ResetPassword, request: Request):
     """Reset user password"""
     db = request.app.mongodb
-    if not db:
-        raise HTTPException(status_code=503, detail="Database unavailable. Check MONGO_URI and DB connectivity.")
     users_collection = db["users"]
     
     # Verify token exists
